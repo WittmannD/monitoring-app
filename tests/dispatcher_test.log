@@ -1,0 +1,46 @@
+[2021-07-18 15:52:40,446] [INFO] [Dispatcher]: Starting up
+[2021-07-18 15:57:09,314] [INFO] [Dispatcher]: Starting up
+[2021-07-18 16:00:07,050] [INFO] [Dispatcher]: Starting up
+[2021-07-18 16:00:08,627] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13224
+    request took: 1.577 seconds
+[2021-07-18 16:01:07,697] [INFO] [Dispatcher]: Starting up
+[2021-07-18 16:01:40,089] [INFO] [Dispatcher]: Starting up
+[2021-07-18 16:02:32,600] [INFO] [Dispatcher]: Starting up
+[2021-07-18 16:02:34,016] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13223
+    request took: 1.416 seconds
+[2021-07-18 16:02:35,482] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13223
+    request took: 1.465 seconds
+[2021-07-18 16:02:37,069] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13223
+    request took: 1.587 seconds
+[2021-07-18 16:02:38,706] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13223
+    request took: 1.637 seconds
+[2021-07-18 16:02:40,208] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13223
+    request took: 1.502 seconds
+[2021-07-18 16:02:41,666] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13223
+    request took: 1.458 seconds
+[2021-07-18 16:02:43,131] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13223
+    request took: 1.464 seconds

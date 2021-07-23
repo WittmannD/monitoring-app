@@ -1,0 +1,52 @@
+aliases:
+
+  seoji_monitor: &seoji_monitor
+    url: "http://seoji.nl.go.kr/landingPage/SearchAjax.do"
+    timeout: 10
+    check_every: 3
+
+  seoji_payload: &seoji_payload
+    tSrch_total: "(연재) 삽화가 2021"
+    fq_select: "tSrch_total"
+    facet.field: "EBOOK_YN"
+    sort: "INPUT_DATE DESC"
+    q: "(연재) 삽화가 2021"
+    wt: "json"
+    rows: 10
+    start: 0
+    page: 1
+
+
+monitors:
+
+  seoji1:
+    <<: *seoji_monitor
+    description: "seoji-1"
+    payload:
+      <<: *seoji_payload
+      tSrch_total: "(연재) 삽화가 2021"
+      q: "(연재) 삽화가 2021"
+
+  seoji2:
+    <<: *seoji_monitor
+    description: "seoji-2"
+    payload:
+      <<: *seoji_payload
+      tSrch_total: "(연재) 삽화가 2021"
+      q: "(연재) 삽화가 2021"
+
+  seoji3:
+    <<: *seoji_monitor
+    description: "seoji-3"
+    payload:
+      <<: *seoji_payload
+      tSrch_total: "(연재) 삽화가 2021"
+      q: "(연재) 삽화가 2021"
+
+  seoji4:
+    <<: *seoji_monitor
+    description: "seoji-4"
+    payload:
+      <<: *seoji_payload
+      tSrch_total: "(연재) 삽화가 2021"
+      q: "(연재) 삽화가 2021"

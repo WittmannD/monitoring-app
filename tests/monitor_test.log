@@ -1,0 +1,15 @@
+[2021-07-18 14:23:01,490] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13223
+    request took: 1.553 seconds
+[2021-07-18 14:56:45,292] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13224
+    request took: 1.719 seconds
+[2021-07-18 14:57:06,009] [INFO] [HttpMonitor]: Check
+    POST http://seoji.nl.go.kr/landingPage/SearchAjax.do
+    response code: 200
+    content length: 13223
+    request took: 1.572 seconds
