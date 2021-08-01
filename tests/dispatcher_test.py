@@ -1,3 +1,4 @@
+from process import DataProcessing
 from dispatcher import Dispatcher
 from monitor import HttpMonitor
 from client import HttpClient
@@ -7,11 +8,16 @@ import logging
 
 
 def test() -> None:
+    def cb(title):
+        print(title)
+
+    config = Config()
+    processing = DataProcessing(cb)
     monitors = [
-        HttpMonitor(HttpClient(), Config()['monitors']['seoji1']),
-        HttpMonitor(HttpClient(), Config()['monitors']['seoji2']),
-        HttpMonitor(HttpClient(), Config()['monitors']['seoji3']),
-        HttpMonitor(HttpClient(), Config()['monitors']['seoji4'])
+        HttpMonitor(HttpClient(), config['monitors']['seoji1'], processing.run),
+        HttpMonitor(HttpClient(), config['monitors']['seoji2'], processing.run),
+        HttpMonitor(HttpClient(), config['monitors']['seoji3'], processing.run),
+        HttpMonitor(HttpClient(), config['monitors']['seoji4'], processing.run)
     ]
     dispatcher = Dispatcher(monitors)
     dispatcher.run()

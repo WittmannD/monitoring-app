@@ -1,8 +1,23 @@
 from typing import Iterable
+from client import HttpClient
+from datetime import datetime
+import asyncio
+import aiofiles
+import os
+
+from models import TranslateRequestModel, PreparedTitleModel
+from translator import Translator
+from setting import ASSETS_PATH
 
 
 class DataProcessing:
     storage = set()
+
+    def __init__(self, callback, http_client=HttpClient()):
+        self.callback = callback
+
+        self.http_client = http_client
+        self.translator = Translator(http_client=http_client)
 
     @staticmethod
     def find_by_isbn(data: Iterable, isbn_set: Iterable) -> list:
@@ -12,7 +27,56 @@ class DataProcessing:
     def prepare_isbn(data: Iterable) -> set:
         return set(item['EA_ISBN'] for item in data)
 
-    def process(self, data: dict) -> None:
+    async def download_image(self, url):
+        if not url:
+            return os.path.join(ASSETS_PATH, 'covers', 'cover.jpg')
+
+        filename = url.split('/')[-1]
+        path = os.path.join(ASSETS_PATH, 'covers', filename)
+
+        async def request_callback(response):
+            if response.status == 200:
+                f = await aiofiles.open(path, mode='wb')
+                await f.write(await response.read())
+                await f.close()
+
+        await self.http_client.request(
+            url=url,
+            timeout=30,
+            method='GET',
+            cb=request_callback
+        )
+
+        return path
+
+    async def translate(self, data):
+        translated = await self.translator.translate([
+            TranslateRequestModel(data['TITLE'], 'en'),
+            TranslateRequestModel(data['TITLE'], 'ru')
+        ])
+        return dict(
+            title_kor=translated[0].sourceText,
+            title_eng=translated[0].translatedText,
+            title_rus=translated[1].translatedText
+        )
+
+    async def handler(self, data):
+        translate_task = asyncio.create_task(self.translate(data))
+        download_image_task = asyncio.create_task(self.download_image(data['TITLE_URL']))
+
+        translated_data, image_path = await asyncio.gather(translate_task, download_image_task)
+
+        title = PreparedTitleModel(
+            **translated_data,
+            cover=image_path,
+            isbn=data['EA_ISBN'],
+            datetime=datetime.now().strftime('%x %X'),
+            description='',
+            keyword=''
+        )
+        self.callback(title)
+
+    def run(self, data: dict) -> None:
         data: list = data['response']['docs']
 
         new_isbn = self.prepare_isbn(data)
@@ -22,4 +86,4 @@ class DataProcessing:
             self.storage = new_isbn
             new_data = self.find_by_isbn(data, existing_isbn)
 
-            notifying(new_data)
+            asyncio.gather(*[self.handler(item) for item in new_data])

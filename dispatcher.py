@@ -21,7 +21,13 @@ class Dispatcher:
     def run(self) -> None:
         asyncio.run(self.start())
 
-    def add_monitor_task(self, monitor: Monitor) -> None:
+    def set_monitors(self, monitors: List[Monitor]) -> None:
+        if not self._stopping:
+            raise Exception('Dispatcher is running!')
+
+        self._monitors = monitors
+
+    def _add_monitor_task(self, monitor: Monitor) -> None:
         self._monitor_tasks.append(
             asyncio.create_task(self._run_monitor(monitor))
         )
@@ -30,7 +36,7 @@ class Dispatcher:
         self._logger.info('Starting up')
 
         for monitor in self._monitors:
-            self.add_monitor_task(monitor)
+            self._add_monitor_task(monitor)
 
         if sys.platform.startswith('win'):
             signal.signal(signal.SIGTERM, self.stop)

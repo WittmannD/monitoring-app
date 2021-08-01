@@ -3,6 +3,7 @@
 import time
 import logging
 from typing import Dict, Any
+from aiohttp import ClientResponse
 
 from setting import *
 from client import HttpClient
@@ -25,21 +26,33 @@ class HttpMonitor(Monitor):
             self,
             http_client: HttpClient,
             options: Dict[str, Any],
+            callback: Any
     ) -> None:
         self._client = http_client
         self._url = options.pop('url')
         self._timeout = options.pop('timeout')
         self._payload = options.pop('payload')
         self._description = options.pop('description')
+
+        self.callback = callback
+
         super().__init__(check_every=options.pop('check_every'))
 
     async def check(self) -> None:
         time_start = time.time()
 
-        response, response_json = await self._client.request(
+        response_json = {}
+
+        async def request_callback(response: ClientResponse):
+            response_json.update(await response.json())
+            return response
+
+        response = await self._client.request(
             url=self._url,
-            payload=self._payload,
             timeout=self._timeout,
+            payload=self._payload,
+            method='POST',
+            cb=request_callback
         )
 
         time_end = time.time()
@@ -57,3 +70,5 @@ class HttpMonitor(Monitor):
             response.content_length,
             round(time_took, 3)
         )
+
+        self.callback(response_json)
