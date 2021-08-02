@@ -1,0 +1,44 @@
+QWidget {
+    font-family: "Work Sans";
+}
+
+QListWidget {
+    border: none;
+}
+
+QListView {
+    show-decoration-selected: 0; /* make the selection span the entire width of the view */
+}
+
+QListView::item {
+    border-radius: 8px;
+}
+
+QListView::item:alternate {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 rgba(219, 219, 219, 255),
+                                       stop:1 rgba(232, 232, 232, 255));
+    border-radius: 8px;
+}
+
+QListView::item:selected {
+    border: none;
+}
+
+QListView::item:selected:!active {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 rgba(219, 219, 219, 255),
+                                       stop:1 rgba(232, 232, 232, 255));
+}
+
+QListView::item:selected:active {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 rgba(219, 219, 219, 255),
+                                       stop:1 rgba(232, 232, 232, 255));
+}
+
+QListView::item:hover {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                   stop:0 rgba(219, 219, 219, 255),
+                                   stop:1 rgba(232, 232, 232, 255));
+}

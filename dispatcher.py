@@ -1,9 +1,9 @@
 """Dispatcher module."""
 
-import sys
 import asyncio
 import logging
 import signal
+import sys
 import time
 from typing import List
 
@@ -34,16 +34,17 @@ class Dispatcher:
 
     async def start(self) -> None:
         self._logger.info('Starting up')
+        self._stopping = False
 
         for monitor in self._monitors:
             self._add_monitor_task(monitor)
 
-        if sys.platform.startswith('win'):
-            signal.signal(signal.SIGTERM, self.stop)
-            signal.signal(signal.SIGINT, self.stop)
-        else:
-            asyncio.get_event_loop().add_signal_handler(signal.SIGTERM, self.stop)
-            asyncio.get_event_loop().add_signal_handler(signal.SIGINT, self.stop)
+        # if sys.platform.startswith('win'):
+        #     signal.signal(signal.SIGTERM, self.stop)
+        #     signal.signal(signal.SIGINT, self.stop)
+        # else:
+        #     asyncio.get_event_loop().add_signal_handler(signal.SIGTERM, self.stop)
+        #     asyncio.get_event_loop().add_signal_handler(signal.SIGINT, self.stop)
 
         await asyncio.gather(*self._monitor_tasks)
 
@@ -59,7 +60,6 @@ class Dispatcher:
             return
 
         self._stopping = True
-
         self._logger.info('Shutting down')
         for task, monitor in zip(self._monitor_tasks, self._monitors):
             task.cancel()

@@ -1,10 +1,10 @@
-from process import DataProcessing
-from dispatcher import Dispatcher
-from monitor import HttpMonitor
+import logging
+
 from client import HttpClient
 from config import Config
-
-import logging
+from dispatcher import Dispatcher
+from monitor import HttpMonitor
+from process import DataProcessing
 
 
 def test() -> None:

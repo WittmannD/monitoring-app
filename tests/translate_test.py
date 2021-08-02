@@ -1,11 +1,9 @@
-from translator import Translator
-from client import HttpClient
-from config import Config
-
-from models import TranslateRequestModel
-import logging
 import asyncio
 import json
+import logging
+
+from models import TranslateRequestModel
+from translator import Translator
 
 
 async def test() -> None:

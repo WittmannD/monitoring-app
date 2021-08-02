@@ -1,52 +1,98 @@
-aliases:
+logging:
+  version: 1
 
-  seoji_monitor: &seoji_monitor
-    url: "http://seoji.nl.go.kr/landingPage/SearchAjax.do"
-    timeout: 10
-    check_every: 3
+  formatters:
+    simple:
+      format: "[%(levelname)s] [%(name)s]: %(message)s"
 
-  seoji_payload: &seoji_payload
-    tSrch_total: "(연재) 삽화가 2021"
-    fq_select: "tSrch_total"
-    facet.field: "EBOOK_YN"
-    sort: "INPUT_DATE DESC"
-    q: "(연재) 삽화가 2021"
-    wt: "json"
-    rows: 10
-    start: 0
-    page: 1
+    complex:
+      format: "[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s"
 
 
-monitors:
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: DEBUG
+      formatter: simple
 
-  seoji1:
-    <<: *seoji_monitor
-    description: "seoji-1"
-    payload:
-      <<: *seoji_payload
+    file:
+      class: logging.handlers.TimedRotatingFileHandler
+      when: midnight
+      backupCount: 5
+      level: DEBUG
+      formatter: complex
+      filename : monitor.log
+
+  loggers:
+    Worker:
+      level: DEBUG
+      handlers: [file]
+      propagate: yes
+
+    HttpMonitor:
+      level: INFO
+      handlers: [file]
+      propagate: yes
+
+    Dispatcher:
+      level: INFO
+      handlers: [file]
+      propagate: yes
+
+    Translator:
+      level: DEBUG
+      handlers: [file]
+      propagate: yes
+
+
+monitoring:
+  aliases:
+    seoji_monitor: &seoji_monitor
+      url: "http://seoji.nl.go.kr/landingPage/SearchAjax.do"
+      timeout: 999
+      check_every: 3
+
+    seoji_payload: &seoji_payload
       tSrch_total: "(연재) 삽화가 2021"
+      fq_select: "tSrch_total"
+      facet.field: "EBOOK_YN"
+      sort: "INPUT_DATE DESC"
       q: "(연재) 삽화가 2021"
+      wt: "json"
+      rows: 10
+      start: 0
+      page: 1
 
-  seoji2:
-    <<: *seoji_monitor
-    description: "seoji-2"
-    payload:
-      <<: *seoji_payload
-      tSrch_total: "(연재) 삽화가 2021"
-      q: "(연재) 삽화가 2021"
 
-  seoji3:
-    <<: *seoji_monitor
-    description: "seoji-3"
-    payload:
-      <<: *seoji_payload
-      tSrch_total: "(연재) 삽화가 2021"
-      q: "(연재) 삽화가 2021"
+  monitors:
+    seoji1:
+      <<: *seoji_monitor
+      description: "seoji-1"
+      payload:
+        <<: *seoji_payload
+        tSrch_total: "(연재) 삽화가 2021"
+        q: "(연재) 삽화가 2021"
 
-  seoji4:
-    <<: *seoji_monitor
-    description: "seoji-4"
-    payload:
-      <<: *seoji_payload
-      tSrch_total: "(연재) 삽화가 2021"
-      q: "(연재) 삽화가 2021"
+    seoji2:
+      <<: *seoji_monitor
+      description: "seoji-2"
+      payload:
+        <<: *seoji_payload
+        tSrch_total: "(연재) 삽화가 2021"
+        q: "(연재) 삽화가 2021"
+
+    seoji3:
+      <<: *seoji_monitor
+      description: "seoji-3"
+      payload:
+        <<: *seoji_payload
+        tSrch_total: "(연재) 삽화가 2021"
+        q: "(연재) 삽화가 2021"
+
+    seoji4:
+      <<: *seoji_monitor
+      description: "seoji-4"
+      payload:
+        <<: *seoji_payload
+        tSrch_total: "(연재) 삽화가 2021"
+        q: "(연재) 삽화가 2021"

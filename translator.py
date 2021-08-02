@@ -1,19 +1,19 @@
-from client import HttpClient
-from urllib.parse import quote
-from collections import namedtuple
-from typing import List, Dict
-import aiohttp
 import asyncio
-import logging
 import json
+import logging
+from typing import List
+from urllib.parse import quote
 
-from setting import GOOGLE_API_KEY
+import aiohttp
+
+from client import HttpClient
 from models import TranslateResponseModel, TranslateRequestModel
+from setting import GOOGLE_API_KEY
 
 
 class Translator:
     API_KEY = GOOGLE_API_KEY
-    
+
     def __init__(self, trying_connection=5, http_client=HttpClient()):
         self.trying_connection = trying_connection
         self._http_client = http_client
@@ -35,21 +35,30 @@ class Translator:
                 return text
 
             except aiohttp.ClientConnectionError as e:
-                self._logger.warning(json.dumps(
-                    {
-                        'Warning': 'Connection was dropped before translate was finished',
-                        'Details': str(e),
-                        'Url': url
-                    },
-                    indent=4))
+                self._logger.warning(
+                    'Translator warning\n'
+                    '    %s\n'
+                    '    details: %s\n'
+                    '    try number: %s',
+                    '    request took: %s seconds',
+                    'Connection was dropped before translate was finished',
+                    str(e),
+                    url,
+                    repeating
+                )
+
             except aiohttp.ClientError as e:
-                self._logger.warning(json.dumps(
-                    {
-                        'Warning': 'Something went wrong. Not a connection error, that was handled',
-                        'Details': str(e),
-                        'Url': url
-                    },
-                    indent=4))
+                self._logger.warning(
+                    'Translator warning\n'
+                    '    %s\n'
+                    '    details: %s\n'
+                    '    url: %s\n'
+                    '    try number: %s',
+                    'Something went wrong. Not a connection error, that was handled',
+                    str(e),
+                    url,
+                    repeating
+                )
 
             finally:
                 repeating += 1
@@ -69,7 +78,7 @@ class Translator:
     async def translate(self, data: List[TranslateRequestModel]):
         async def session_callback(session):
             return await asyncio.gather(*[self.__process(session, item.source, item.target_language)
-                                         for item in data])
+                                          for item in data])
 
         return await self._http_client.session(
             timeout=len(data) * 15,

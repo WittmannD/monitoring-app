@@ -1,9 +1,9 @@
-from monitor import HttpMonitor
+import asyncio
+import logging
+
 from client import HttpClient
 from config import Config
-
-import logging
-import asyncio
+from monitor import HttpMonitor
 
 
 async def test() -> None:

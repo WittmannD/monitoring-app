@@ -1,10 +1,9 @@
-import os
 from yaml import load, CLoader, CDumper
+
 from setting import CONFIG_PATH
 
 
 class Config(dict):
-
     LOADER = CLoader
     DUMPER = CDumper
 

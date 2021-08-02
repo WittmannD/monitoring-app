@@ -1,0 +1,83 @@
+[
+  {
+    "name": "session",
+    "value": "czx70tesf9cxlpmnx8zby8",
+    "domain": "remanga.org",
+    "path": "/",
+    "expires": 1655334423.375454,
+    "httpOnly": false,
+    "secure": false
+  },
+  {
+    "name": "_ym_d",
+    "value": "1623798429",
+    "domain": ".remanga.org",
+    "path": "/",
+    "expires": 1655334428,
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "_ym_uid",
+    "value": "1623798429149953474",
+    "domain": ".remanga.org",
+    "path": "/",
+    "expires": 1655334428,
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "_ga_K8ME2PJL77",
+    "value": "GS1.1.1624231120.2.1.1624231897.0",
+    "domain": ".remanga.org",
+    "path": "/",
+    "expires": 1687303897,
+    "httpOnly": false,
+    "secure": false
+  },
+  {
+    "name": "user",
+    "value": "%7B%22id%22%3A86791%2C%22username%22%3A%22Magatsukami%22%2C%22badges%22%3A%5B%5D%2C%22is_superuser%22%3Afalse%2C%22is_staff%22%3Afalse%2C%22balance%22%3A%220.00%22%2C%22ticket_balance%22%3A0%2C%22avatar%22%3A%22%2Fmedia%2Fusers%2F86791%2Favatar_lT5PaHp.jpg%22%2C%22email%22%3A%22danjavitman%40gmail.com%22%2C%22sex%22%3A1%2C%22vk_not%22%3Afalse%2C%22yaoi%22%3A0%2C%22adult%22%3Afalse%2C%22chapters_read%22%3A48756%2C%22vk_id%22%3Anull%2C%22google_id%22%3Anull%2C%22yandex_id%22%3Anull%2C%22mail_id%22%3Anull%2C%22is_two_factor_auth%22%3Afalse%2C%22tagline%22%3A%221337%22%2C%22preference%22%3A0%2C%22count_views%22%3A48756%2C%22count_votes%22%3A47719%2C%22count_comments%22%3A10%2C%22access_token%22%3A%22PuWPkqL2LHlCdX7rrShR9VzX0qaoSo%22%2C%22two_factor_auth%22%3Afalse%7D",
+    "domain": "remanga.org",
+    "path": "/",
+    "expires": 1658347016.517017,
+    "httpOnly": false,
+    "secure": false
+  },
+  {
+    "name": "_gid",
+    "value": "GA1.2.1174092188.1626784404",
+    "domain": ".remanga.org",
+    "path": "/",
+    "expires": 1626897416,
+    "httpOnly": false,
+    "secure": false
+  },
+  {
+    "name": "_ym_isad",
+    "value": "1",
+    "domain": ".remanga.org",
+    "path": "/",
+    "expires": 1626856411,
+    "httpOnly": false,
+    "secure": true
+  },
+  {
+    "name": "_ga",
+    "value": "GA1.2.1232805164.1623798424",
+    "domain": ".remanga.org",
+    "path": "/",
+    "expires": 1689883016,
+    "httpOnly": false,
+    "secure": false
+  },
+  {
+    "name": "_ga_81J4Q19D6Y",
+    "value": "GS1.1.1626811016.126.1.1626811026.0",
+    "domain": ".remanga.org",
+    "path": "/",
+    "expires": 1689883026,
+    "httpOnly": false,
+    "secure": false
+  }
+]

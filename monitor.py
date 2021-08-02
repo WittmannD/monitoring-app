@@ -1,12 +1,13 @@
 """Monitors module."""
 
-import time
 import logging
+import time
 from typing import Dict, Any
+
 from aiohttp import ClientResponse
 
-from setting import *
 from client import HttpClient
+from setting import *
 
 
 class Monitor:
@@ -14,7 +15,6 @@ class Monitor:
     def __init__(self, check_every: int) -> None:
         self.check_every = check_every
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.propagate = LOGGING
 
     async def check(self) -> None:
         raise NotImplementedError()

@@ -1,20 +1,21 @@
-from typing import Iterable
-from client import HttpClient
-from datetime import datetime
 import asyncio
-import aiofiles
 import os
+from datetime import datetime
+from typing import Iterable
 
+import aiofiles
+
+from client import HttpClient
 from models import TranslateRequestModel, PreparedTitleModel
-from translator import Translator
 from setting import ASSETS_PATH
+from translator import Translator
 
 
 class DataProcessing:
     storage = set()
 
-    def __init__(self, callback, http_client=HttpClient()):
-        self.callback = callback
+    def __init__(self, controller, http_client=HttpClient()):
+        self.controller = controller
 
         self.http_client = http_client
         self.translator = Translator(http_client=http_client)
@@ -40,12 +41,15 @@ class DataProcessing:
                 await f.write(await response.read())
                 await f.close()
 
-        await self.http_client.request(
-            url=url,
-            timeout=30,
-            method='GET',
-            cb=request_callback
-        )
+        try:
+            await self.http_client.request(
+                url=url,
+                timeout=30,
+                method='GET',
+                cb=request_callback
+            )
+        except Exception:
+            return os.path.join(ASSETS_PATH, 'covers', 'cover.jpg')
 
         return path
 
@@ -74,7 +78,7 @@ class DataProcessing:
             description='',
             keyword=''
         )
-        self.callback(title)
+        self.controller.tilted_listener.emit(title)
 
     def run(self, data: dict) -> None:
         data: list = data['response']['docs']

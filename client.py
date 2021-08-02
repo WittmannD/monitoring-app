@@ -1,7 +1,8 @@
 """Http client module."""
 
+from typing import Any
+
 from aiohttp import ClientSession, ClientTimeout, ClientResponse
-from typing import Tuple, Any
 
 
 class HttpClient:
@@ -14,7 +15,6 @@ class HttpClient:
             method: str = 'POST',
             cb: Any = None
     ) -> ClientResponse:
-
         async with ClientSession(timeout=ClientTimeout(timeout)) as session:
             async with session.request(method=method, url=url, data=payload) as response:
                 return await cb(response)
