@@ -76,9 +76,10 @@ class DataProcessing:
             isbn=data['EA_ISBN'],
             datetime=datetime.now().strftime('%x %X'),
             description='',
-            keyword=''
+            keyword='',
+            timestamp=datetime.timestamp(datetime.now())
         )
-        self.controller.tilted_listener.emit(title)
+        self.controller.title_transfer.emit(title)
 
     def run(self, data: dict) -> None:
         data: list = data['response']['docs']
@@ -87,7 +88,12 @@ class DataProcessing:
         existing_isbn = new_isbn.difference(self.storage)
 
         if existing_isbn:
-            self.storage = new_isbn
+            if not self.storage:
+                self.storage = new_isbn
+                return
+            else:
+                self.storage = new_isbn
+
             new_data = self.find_by_isbn(data, existing_isbn)
 
             asyncio.gather(*[self.handler(item) for item in new_data])

@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView, QWebEngineProfile, QWebEngineSettings
 from PyQt5.QtNetwork import QNetworkCookie
 
@@ -6,6 +7,8 @@ from asyncqt import QEventLoop
 from datetime import datetime
 import asyncio
 import json
+
+from models import PreparedTitleModel
 
 URL = 'https://remanga.org/panel/add-titles/'
 
@@ -49,11 +52,13 @@ class WebView(QWebEngineView):
 
         super(WebView, self).__init__(*args, **kwargs)
 
+        self.loaded = False
+
         self.profile = QWebEngineProfile('storage', self)
         self.cookieStore = self.profile.cookieStore()
         self.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
 
-        with open('cookie.json', encoding='utf-8') as f:
+        with open('./gui/browser/cookie.json', encoding='utf-8') as f:
             self.setCookieFromJson(f)
 
         self.page = WebPage(self.profile, self)
@@ -73,12 +78,10 @@ class WebView(QWebEngineView):
             self.cookieStore.setCookie(cooka, QtCore.QUrl(URL.replace(QtCore.QUrl(URL).path(), '')))
 
     def initUi(self):
-        self.setGeometry(300, 300, 500, 300)
-
         self.setPage(self.page)
         self.page.load(QtCore.QUrl(URL))
 
-        self.show()
+        # self.show()
 
 
 class WebPage(QWebEnginePage):

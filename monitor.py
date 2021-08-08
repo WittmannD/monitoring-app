@@ -33,6 +33,7 @@ class HttpMonitor(Monitor):
         self._timeout = options.pop('timeout')
         self._payload = options.pop('payload')
         self._description = options.pop('description')
+        self._method = options.pop('method')
 
         self.callback = callback
 
@@ -42,7 +43,6 @@ class HttpMonitor(Monitor):
         time_start = time.time()
 
         response_json = {}
-
         async def request_callback(response: ClientResponse):
             response_json.update(await response.json())
             return response
@@ -51,7 +51,7 @@ class HttpMonitor(Monitor):
             url=self._url,
             timeout=self._timeout,
             payload=self._payload,
-            method='POST',
+            method=self._method,
             cb=request_callback
         )
 

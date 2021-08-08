@@ -1,3 +1,6 @@
+from typing import List
+
+from client import HttpClient
 from dispatcher import Dispatcher
 from monitor import HttpMonitor
 
@@ -47,7 +50,7 @@ class Worker(QRunnable):
         except Exception as err:
             traceback.print_exc()
             # exctype, value = sys.exc_info()[:2]
-            self._logger.exception('Worker error', exc_info=sys.exc_info()[:2])
+            self._logger.exception('Worker error')
 
         #     self.signals.error.emit((exctype, value, traceback.format_exc()))
         #
@@ -59,26 +62,35 @@ class Worker(QRunnable):
 
 
 class Monitoring:
-    def __init__(self, monitors: list, controller):
-        self._monitors = monitors
+    def __init__(self, controller, processing, http_client=HttpClient(), monitors: List[HttpMonitor] = None):
         self._controller = controller
+        self._processing = processing
+        self._http_client = http_client
+        self._controller.start_monitoring.connect(self.start)
 
-        self.dispatcher = Dispatcher(self._monitors)
+        self.dispatcher = Dispatcher(monitors)
 
         self.threadpool = QThreadPool()
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
-    def start(self):
+    def start(self, options_list: List[dict]):
         # Pass the function to execute
-        worker = Worker(self.dispatcher.run, controller=self._controller) # Any other args, kwargs are passed to the run function
+        monitors = []
+        for options in options_list:
+            monitors.append(HttpMonitor(self._http_client, options, self._processing.run))
+
+        if not self.dispatcher.is_stopped():
+            self.stop()
+
+        self.dispatcher.set_monitors(monitors)
+        worker = Worker(self.dispatcher.run, controller=self._controller)
+        # Any other args, kwargs are passed to the run function
         # worker.signals.result.connect(self.print_output)
         # worker.signals.finished.connect(self.thread_complete)
 
         # Execute
         self.threadpool.start(worker)
 
-    def add_monitor(self, monitor: HttpMonitor):
-        self._monitors.append(monitor)
-
     def stop(self):
         self.dispatcher.stop()
+        self.threadpool.clear()

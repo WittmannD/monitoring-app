@@ -25,20 +25,15 @@ if __name__ == '__main__':
     QCoreApplication.setOrganizationDomain('mushokutensei.herokuapp.com')
     QCoreApplication.setApplicationName('Monitoring Bot')
 
-    main_window = MainWindow()
+    main_window = MainWindow(config.get('monitoring'))
     http_client = HttpClient()
 
     controller = Controller(main_window)
     processing = DataProcessing(controller, http_client=http_client)
 
-    monitors = [
-        HttpMonitor(http_client, config.get('monitoring')['monitors']['seoji1'], processing.run)
-    ]
-
-    monitoring = Monitoring(monitors, controller)
-
-    monitoring.start()
+    monitoring = Monitoring(controller, processing, http_client=http_client)
 
     main_window.show()
     app.exec()
+
     monitoring.stop()

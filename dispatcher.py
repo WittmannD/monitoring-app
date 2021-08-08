@@ -16,10 +16,16 @@ class Dispatcher:
         self._monitors = monitors
         self._monitor_tasks: List[asyncio.Task] = []
         self._logger = logging.getLogger(self.__class__.__name__)
-        self._stopping = False
+        self._stopping = True
 
     def run(self) -> None:
-        asyncio.run(self.start())
+        try:
+            asyncio.run(self.start())
+        except asyncio.CancelledError:
+            pass
+
+    def is_stopped(self):
+        return self._stopping
 
     def set_monitors(self, monitors: List[Monitor]) -> None:
         if not self._stopping:
@@ -35,7 +41,6 @@ class Dispatcher:
     async def start(self) -> None:
         self._logger.info('Starting up')
         self._stopping = False
-
         for monitor in self._monitors:
             self._add_monitor_task(monitor)
 
@@ -56,15 +61,17 @@ class Dispatcher:
         self.stop()
 
     def stop(self) -> None:
-        if self._stopping:
+        if self._stopping or not self._monitors:
             return
 
-        self._stopping = True
         self._logger.info('Shutting down')
         for task, monitor in zip(self._monitor_tasks, self._monitors):
-            task.cancel()
+            if not task.cancelled():
+                task.cancel()
+
         self._monitor_tasks.clear()
         self._logger.info('Shutdown finished successfully')
+        self._stopping = True
 
     @staticmethod
     async def _run_monitor(monitor: Monitor) -> None:
@@ -74,7 +81,6 @@ class Dispatcher:
 
         while True:
             time_start = time.time()
-
             try:
                 await monitor.check()
             except asyncio.CancelledError:

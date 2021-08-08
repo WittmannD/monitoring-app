@@ -1,5 +1,5 @@
 """Http client module."""
-
+import logging
 from typing import Any
 
 from aiohttp import ClientSession, ClientTimeout, ClientResponse
