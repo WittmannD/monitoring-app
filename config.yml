@@ -46,14 +46,19 @@ logging:
 
     HttpClient:
       level: INFO
-      handlers: [ console ]
+      handlers: [console]
       propagate: yes
 
 
 monitoring:
   aliases:
     seoji_monitor: &seoji_monitor
-      # url: "http://seoji.nl.go.kr/landingPage/SearchAjax.do"
+      url: "http://seoji.nl.go.kr/landingPage/SearchAjax.do"
+      timeout: 999
+      check_every: 3
+      method: 'POST'
+
+    test_monitor: &test_monitor
       url: "http://localhost:8080/get_isbn"
       timeout: 999
       check_every: 3
@@ -78,26 +83,29 @@ monitoring:
         tSrch_total: "(연재) 삽화가 2021"
         q: "(연재) 삽화가 2021"
 
-    seoji2:
-      <<: *seoji_monitor
-      description: "seoji-2"
+    test1:
+      <<: *test_monitor
+      url: "http://localhost:8080/get_isbn/10"
+      description: "seed 10"
       payload:
         <<: *seoji_payload
         tSrch_total: "(연재) 삽화가 2021"
         q: "(연재) 삽화가 2021"
 
-    seoji3:
-      <<: *seoji_monitor
-      description: "seoji-3"
+    test2:
+      <<: *test_monitor
+      url: "http://localhost:8080/get_isbn/123"
+      description: "seed 123"
       payload:
         <<: *seoji_payload
         tSrch_total: "(연재) 삽화가 2021"
         q: "(연재) 삽화가 2021"
 
-    seoji4:
-      <<: *seoji_monitor
-      description: "seoji-4"
+    test3:
+      <<: *test_monitor
+      description: "seed 99"
+      url: "http://localhost:8080/get_isbn/99"
       payload:
         <<: *seoji_payload
-        tSrch_total: "(연재) 삽화가"
-        q: "(연재) 삽화가"
+        tSrch_total: "(연재) 삽화가 2021"
+        q: "(연재) 삽화가 2021"

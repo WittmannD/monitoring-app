@@ -1,19 +1,15 @@
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QCoreApplication
-import sys
-import asyncio
-import logging
 import logging.config
+import sys
+
+from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtWidgets import QApplication
 
 from client import HttpClient
 from config import Config
-from monitor import HttpMonitor
+from gui.controller import Controller
+from gui.main import MainWindow
 from monitoring import Monitoring
 from process import DataProcessing
-
-from gui.main import MainWindow
-from gui.controller import Controller
-
 
 if __name__ == '__main__':
     config = Config()
@@ -21,6 +17,7 @@ if __name__ == '__main__':
     logging.config.dictConfig(config.get('logging'))
 
     app = QApplication(sys.argv)
+
     QCoreApplication.setOrganizationName('mushokutensei')
     QCoreApplication.setOrganizationDomain('mushokutensei.herokuapp.com')
     QCoreApplication.setApplicationName('Monitoring Bot')

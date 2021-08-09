@@ -1,9 +1,11 @@
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, Qt
+
 from models import PreparedTitleModel
 
 
 class Controller(QObject):
     title_transfer = pyqtSignal(PreparedTitleModel)
+    titles_found = pyqtSignal(list)
     start_monitoring = pyqtSignal(list)
 
     def __init__(self, ui, *args, **kwargs):
@@ -20,12 +22,16 @@ class Controller(QObject):
         self.ui.monitor_reload_button.clicked.connect(self.reload_monitors_slot)
 
         self.title_transfer.connect(self.title_transfer_slot)
+        self.titles_found.connect(self.titles_found_slot)
 
         self.ui.fill_form.connect(self.fill_form_slot)
-
+        self.ui.delete_item.connect(self.ui.delete_item_slot)
 
     def title_transfer_slot(self, data: PreparedTitleModel):
         self.ui.add_item(data)
+
+    def titles_found_slot(self, data):
+        self.ui.notify(data)
 
     def fill_form_slot(self, data: PreparedTitleModel):
         self.ui.right_container_tab_widget.setCurrentIndex(1)

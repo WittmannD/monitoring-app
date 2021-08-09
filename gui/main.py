@@ -1,13 +1,12 @@
-from datetime import datetime
 import sys
 
+from PyQt5.QtCore import QSettings, Qt
 from PyQt5.QtWidgets import QMainWindow, QApplication
-from PyQt5.QtCore import QSettings
+from plyer import notification
 
 from gui.browser.form_filler import FormFiller
 from gui.ui import Ui_MainWindow
-
-from models import PreparedTitleModel, MonitorModel
+from models import MonitorModel
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -33,12 +32,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def load_monitors(self, monitors: dict):
         monitors = list(map(
             lambda monitor_name:
-                MonitorModel(
-                    name=monitor_name,
-                    keyword=monitors[monitor_name]['payload']['q'],
-                    description=monitors[monitor_name]['description'],
-                    timestamp=None
-                ),
+            MonitorModel(
+                name=monitor_name,
+                keyword=monitors[monitor_name]['payload']['q'],
+                description=monitors[monitor_name]['description'],
+                timestamp=None
+            ),
             monitors
         ))
         super(MainWindow, self).load_monitors(monitors)
@@ -53,8 +52,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def closeEvent(self, a0) -> None:
         self.settings.setValue('titles', self.stored_titles)
         self.settings.setValue('monitors', self.stored_monitors)
-        
+
         super(MainWindow, self).closeEvent(a0)
+
+    def notify(self, data):
+        notification.notify(
+            title='Found new records',
+            message='{0!s}'.format(len(data)),
+            app_name='Monitoring Bot',
+            ticker='Seoji Bot new title'
+        )
+
+        self.setWindowState(self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        flags = self.windowFlags()
+        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(flags)
+        self.show()
+        self.activateWindow()
 
 
 if __name__ == '__main__':
@@ -62,4 +76,3 @@ if __name__ == '__main__':
     main_window = MainWindow()
     main_window.show()
     app.exec_()
-

@@ -1,19 +1,16 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSlot, pyqtSignal
-from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView, QWebEngineProfile, QWebEngineSettings
-from PyQt5.QtNetwork import QNetworkCookie
-
-from asyncqt import QEventLoop
-from datetime import datetime
 import asyncio
 import json
+from datetime import datetime
 
-from models import PreparedTitleModel
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtNetwork import QNetworkCookie
+from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView, QWebEngineProfile, QWebEngineSettings
+from asyncqt import QEventLoop
 
 URL = 'https://remanga.org/panel/add-titles/'
 
-def inline_cb():
 
+def inline_cb():
     def call(func):
 
         def wrapper(*args, **kwargs):
@@ -49,7 +46,6 @@ class ApiWrapper:
 class WebView(QWebEngineView):
 
     def __init__(self, *args, **kwargs):
-
         super(WebView, self).__init__(*args, **kwargs)
 
         self.loaded = False
@@ -58,11 +54,16 @@ class WebView(QWebEngineView):
         self.cookieStore = self.profile.cookieStore()
         self.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
 
+        self.loadFinished.connect(self._loadFinished)
+
         with open('./gui/browser/cookie.json', encoding='utf-8') as f:
             self.setCookieFromJson(f)
 
         self.page = WebPage(self.profile, self)
         self.initUi()
+
+    def _loadFinished(self, ok):
+        self.loaded = True
 
     def setCookieFromJson(self, jsondata):
         data = json.load(jsondata)
@@ -93,6 +94,7 @@ class WebPage(QWebEnginePage):
         self.evaluateJavaScript = ApiWrapper(self._evaluateJavaScript)
         self.sendMouseEvent = ApiWrapper(self._sendMouseEvent)
         self.sendKeyEvent = ApiWrapper(self._sendKeyEvent)
+        self.typeText = ApiWrapper(self._typeText)
         self.scrollTo = ApiWrapper(self._scrollTo)
         self.clickTo = ApiWrapper(self._clickTo)
         self.click = ApiWrapper(self._click)
@@ -103,10 +105,14 @@ class WebPage(QWebEnginePage):
     def _evaluateJavaScript(self, *args, **kwargs):
         super(WebPage, self).runJavaScript(*args, **kwargs)
 
-    def _sendKeyEvent(self, key, callback):
+    @inline_cb()
+    async def _sendKeyEvent(self, key, text, callback):
         try:
-            event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, key, QtCore.Qt.NoModifier)
+            event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, key, QtCore.Qt.NoModifier, text=text)
             render_widget = self.view().findChild(QtWidgets.QWidget)
+            QtCore.QCoreApplication.postEvent(render_widget, event)
+
+            event = QtGui.QKeyEvent(QtCore.QEvent.KeyRelease, key, QtCore.Qt.NoModifier, '')
             QtCore.QCoreApplication.postEvent(render_widget, event)
 
         except Exception as err:
@@ -116,7 +122,21 @@ class WebPage(QWebEnginePage):
         finally:
             callback(True)
 
-    def _sendMouseEvent(self, event, point, callback):
+    @inline_cb()
+    async def _typeText(self, text, callback):
+        try:
+            for letter in text:
+                await self.sendKeyEvent(0, letter)
+
+        except Exception as err:
+            callback(False)
+            raise err
+
+        finally:
+            callback(True)
+
+    @inline_cb()
+    async def _sendMouseEvent(self, event, point, callback):
         try:
             event = QtGui.QMouseEvent(event, point, QtCore.Qt.LeftButton, QtCore.Qt.LeftButton,
                                       QtCore.Qt.NoModifier)
@@ -161,9 +181,10 @@ class WebPage(QWebEnginePage):
     async def _clickTo(self, selector, callback):
         try:
             position = await self.evaluateJavaScript('''
-                document.querySelector("{0}").scrollIntoViewIfNeeded();
-                var rect = document.querySelector("{0}").getBoundingClientRect();
-                [rect.left, rect.top];
+                var element = document.querySelector("{0}");
+                element.scrollIntoViewIfNeeded();
+                var rect = element.getBoundingClientRect();
+                [~~(rect.left + rect.width / 2), ~~(rect.top + rect.height / 2)];
             '''.format(selector))
 
             await self.click(QtCore.QPoint(*position))

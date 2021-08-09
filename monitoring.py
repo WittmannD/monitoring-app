@@ -1,16 +1,12 @@
+import logging
+import traceback
 from typing import List
+
+from PyQt5.QtCore import *
 
 from client import HttpClient
 from dispatcher import Dispatcher
 from monitor import HttpMonitor
-
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-
-import time
-import traceback, sys
-import logging
 
 
 class Worker(QRunnable):
@@ -74,13 +70,15 @@ class Monitoring:
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
     def start(self, options_list: List[dict]):
-        # Pass the function to execute
+        if not self.dispatcher.is_stopped():
+            self.stop()
+
+        if not options_list:
+            return
+
         monitors = []
         for options in options_list:
             monitors.append(HttpMonitor(self._http_client, options, self._processing.run))
-
-        if not self.dispatcher.is_stopped():
-            self.stop()
 
         self.dispatcher.set_monitors(monitors)
         worker = Worker(self.dispatcher.run, controller=self._controller)

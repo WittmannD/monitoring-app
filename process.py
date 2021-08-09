@@ -7,12 +7,12 @@ import aiofiles
 
 from client import HttpClient
 from models import TranslateRequestModel, PreparedTitleModel
-from setting import ASSETS_PATH
+from setting import ASSETS_PATH, DOWNLOAD_COVERS
 from translator import Translator
 
 
 class DataProcessing:
-    storage = set()
+    storage = dict()
 
     def __init__(self, controller, http_client=HttpClient()):
         self.controller = controller
@@ -29,7 +29,7 @@ class DataProcessing:
         return set(item['EA_ISBN'] for item in data)
 
     async def download_image(self, url):
-        if not url:
+        if not url or not DOWNLOAD_COVERS:
             return os.path.join(ASSETS_PATH, 'covers', 'cover.jpg')
 
         filename = url.split('/')[-1]
@@ -54,9 +54,14 @@ class DataProcessing:
         return path
 
     async def translate(self, data):
+        title = data['TITLE']
+        exceptions = [u'(연재)', u'(웹툰)', u'[연재]', u'[웹툰]', u'( 연재 )', u'( 웹툰 )', u'연재', u'웹툰']
+        for ex in exceptions:
+            text = title.replace(ex, '')
+
         translated = await self.translator.translate([
-            TranslateRequestModel(data['TITLE'], 'en'),
-            TranslateRequestModel(data['TITLE'], 'ru')
+            TranslateRequestModel(title, 'en'),
+            TranslateRequestModel(title, 'ru')
         ])
         return dict(
             title_kor=translated[0].sourceText,
@@ -64,7 +69,7 @@ class DataProcessing:
             title_rus=translated[1].translatedText
         )
 
-    async def handler(self, data):
+    async def handler(self, data, keyword):
         translate_task = asyncio.create_task(self.translate(data))
         download_image_task = asyncio.create_task(self.download_image(data['TITLE_URL']))
 
@@ -76,24 +81,28 @@ class DataProcessing:
             isbn=data['EA_ISBN'],
             datetime=datetime.now().strftime('%x %X'),
             description='',
-            keyword='',
+            keyword=keyword,
             timestamp=datetime.timestamp(datetime.now())
         )
         self.controller.title_transfer.emit(title)
 
     def run(self, data: dict) -> None:
+        keyword = data['keyword']
         data: list = data['response']['docs']
 
         new_isbn = self.prepare_isbn(data)
-        existing_isbn = new_isbn.difference(self.storage)
+        stored = self.storage.setdefault(keyword, set())
+        existing_isbn = new_isbn.difference(stored)
 
         if existing_isbn:
-            if not self.storage:
-                self.storage = new_isbn
+            if not stored:
+                stored.update(new_isbn)
                 return
-            else:
-                self.storage = new_isbn
+
+            stored.update(new_isbn)
 
             new_data = self.find_by_isbn(data, existing_isbn)
 
-            asyncio.gather(*[self.handler(item) for item in new_data])
+            self.controller.titles_found.emit(new_data)
+
+            asyncio.gather(*[self.handler(item, keyword) for item in new_data])

@@ -7,7 +7,6 @@ from typing import Dict, Any
 from aiohttp import ClientResponse
 
 from client import HttpClient
-from setting import *
 
 
 class Monitor:
@@ -43,6 +42,7 @@ class HttpMonitor(Monitor):
         time_start = time.time()
 
         response_json = {}
+
         async def request_callback(response: ClientResponse):
             response_json.update(await response.json())
             return response
@@ -54,6 +54,8 @@ class HttpMonitor(Monitor):
             method=self._method,
             cb=request_callback
         )
+
+        response_json.update({'keyword': self._payload.get('q')})
 
         time_end = time.time()
         time_took = time_end - time_start
